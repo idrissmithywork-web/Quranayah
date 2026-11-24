@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Quranayah – Guidance Strictly from the Qur’an</title>
+<title>Quranayah – Guidance from the Qur’an</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://js.puter.com/v2/"></script>
 <style>
 :root{
   --bg:#07120d;
@@ -40,18 +39,18 @@ body::before{
 }
 .wrap{max-width:640px;margin:0 auto;padding:16px 16px 48px;position:relative}
 
-/* Account Bar */
+/* Top Account Bar */
 .auth-bar{
-  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
   background:rgba(255,255,255,.04);border:1px solid var(--line);
-  border-radius:14px;padding:8px 14px;margin-bottom:14px;font-size:.82rem;
+  border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:.82rem;
 }
-.auth-status{color:var(--mute);display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.auth-status{color:var(--mute);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .dot{width:8px;height:8px;border-radius:50%;background:#6a7a70;flex-shrink:0}
 .dot.on{background:#4cd995;box-shadow:0 0 8px #4cd995}
 .auth-btn{
   background:transparent;border:1px solid var(--line);color:var(--gold);
-  border-radius:9px;padding:6px 11px;font:500 .8rem Inter,sans-serif;cursor:pointer;white-space:nowrap;
+  border-radius:9px;padding:6px 12px;font:500 .8rem Inter,sans-serif;cursor:pointer;white-space:nowrap;
 }
 .auth-btn:hover{border-color:var(--gold);background:rgba(224,187,98,.08)}
 
@@ -65,7 +64,7 @@ h1{
 .sub{color:var(--mute);letter-spacing:.04em;font-size:.9rem;margin:4px 0 0}
 
 textarea{
-  width:100%;min-height:130px;color:var(--ink);font:inherit;resize:vertical;
+  width:100%;min-height:120px;color:var(--ink);font:inherit;resize:vertical;
   background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:18px;
   padding:16px;font-size:1rem;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.35);
 }
@@ -73,7 +72,7 @@ textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(2
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
 .chip{
   border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);
-  border-radius:99px;padding:7px 12px;font-size:.85rem;cursor:pointer;transition:.2s;
+  border-radius:99px;padding:7px 13px;font-size:.85rem;cursor:pointer;transition:.2s;
 }
 .chip:hover{border-color:var(--gold);color:var(--gold)}
 
@@ -138,11 +137,11 @@ button.main:active{transform:scale(.99)}
 </head>
 <body>
 <div class="wrap">
-  <!-- User Account & AI Credits Bar -->
+  <!-- Fast Sign-In Bar -->
   <div class="auth-bar">
     <div class="auth-status">
       <span class="dot" id="authDot"></span>
-      <span id="authText">Not signed in · Uses your own AI credits</span>
+      <span id="authText">Not signed in</span>
     </div>
     <button class="auth-btn" id="authBtn">Sign in (Google / Email)</button>
   </div>
@@ -151,24 +150,23 @@ button.main:active{transform:scale(.99)}
     <p class="bism">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
     <h1>Quranayah</h1>
     <div class="orn"></div>
-    <p class="sub">Direct answers &amp; guidance, strictly from the Qur’an</p>
+    <p class="sub">Guidance &amp; answers, strictly from the Qur’an</p>
   </header>
 
-  <textarea id="q" placeholder="Ask what the Qur’an says about a topic, situation, or question (e.g. “Can men wear gold?”, “How is inheritance divided?”, “I feel anxious about the future”)…"></textarea>
+  <textarea id="q" placeholder="How are you feeling or what would you like to check in the Qur’an?"></textarea>
   <div class="chips" id="chips"></div>
-  <button class="main" id="go">Search the Qur’an</button>
+  <button class="main" id="go">Get guidance</button>
   <p class="note">
-    Sign in with your Google or email account to use your own free monthly AI credits. 
-    This tool pulls <strong>strictly from the Qur’an</strong>—for Hadith or scholarly rulings, consult 
+    Quick sign-in with Google or Email (no card required). Pulls <strong>strictly from the Qur’an</strong>—for Hadith or scholarly rulings, visit 
     <a href="https://sunnah.com" target="_blank" rel="noopener">Sunnah.com</a> or 
     <a href="https://islamqa.info" target="_blank" rel="noopener">IslamQA.info</a>.
   </p>
 
-  <div class="spin" id="spin">Searching all 114 surahs of the Qur’an…</div>
+  <div class="spin" id="spin">Looking up verses in the Qur’an…</div>
   <div id="out"></div>
 </div>
 
-<!-- Share Sheet -->
+<!-- Share Card Modal -->
 <div class="sheet" id="sheet"><div class="panel">
   <canvas id="cv" width="1080" height="1350"></canvas>
   <div class="row" style="margin-bottom:8px">
@@ -188,12 +186,13 @@ button.main:active{transform:scale(.99)}
 <script>
 const $ = id => document.getElementById(id);
 
+/* Simple, everyday starter options */
 const examples = [
-  "Can men wear gold or silk?",
-  "How is inheritance divided?",
-  "I feel anxious about the future",
-  "Can I take interest on a loan?",
-  "I made a big mistake and feel guilty"
+  "I am feeling sad",
+  "Can men wear gold?",
+  "I feel anxious",
+  "I made a mistake",
+  "Give me patience"
 ];
 examples.forEach(t => {
   const b = document.createElement('button');
@@ -217,117 +216,138 @@ function el(tag, cls, text) {
   return e;
 }
 
-/* ---------- Authentication & User AI Credits ---------- */
-async function updateAuthUI() {
-  try {
-    if (puter.auth.isSignedIn()) {
-      const user = await puter.auth.getUser();
-      const label = user.email || user.username || 'Signed in';
-      $('authDot').classList.add('on');
-      $('authText').textContent = `Signed in as ${label}`;
-      $('authBtn').textContent = 'Switch account / Sign out';
-    } else {
-      $('authDot').classList.remove('on');
-      $('authText').textContent = 'Not signed in · Uses your own AI credits';
-      $('authBtn').textContent = 'Sign in (Google / Email)';
-    }
-  } catch (e) {
-    console.warn('Auth check:', e);
+/* ---------- 1-Click OAuth PKCE Sign-In (Google / Email, No Card Required) ---------- */
+const KEY_STORAGE = 'quranayah_user_api_key';
+
+function getUserKey() {
+  return localStorage.getItem(KEY_STORAGE) || '';
+}
+
+function updateAuthUI() {
+  const hasKey = Boolean(getUserKey());
+  if (hasKey) {
+    $('authDot').classList.add('on');
+    $('authText').textContent = 'Signed in · Free AI credits active';
+    $('authBtn').textContent = 'Switch account / Sign out';
+  } else {
+    $('authDot').classList.remove('on');
+    $('authText').textContent = 'Not signed in';
+    $('authBtn').textContent = 'Sign in (Google / Email)';
   }
 }
 
-$('authBtn').onclick = async () => {
+function generateVerifier() {
+  const arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function sha256Base64Url(str) {
+  const data = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function startSignIn() {
+  const verifier = generateVerifier();
+  sessionStorage.setItem('pkce_verifier', verifier);
+  const challenge = await sha256Base64Url(verifier);
+  const callbackUrl = window.location.origin + window.location.pathname;
+  window.location.href = `https://openrouter.ai/auth?callback_url=${encodeURIComponent(callbackUrl)}&code_challenge=${challenge}&code_challenge_method=S256`;
+}
+
+async function handleOAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  if (!code || !verifier) return;
+
   try {
-    if (puter.auth.isSignedIn()) {
-      await puter.auth.signOut();
-      toast('Signed out. You can now sign in with another account.');
-      await updateAuthUI();
-    } else {
-      await puter.auth.signIn();
-      await updateAuthUI();
-      toast('Signed in! Your AI credits are ready.');
+    const res = await fetch('https://openrouter.ai/api/v1/auth/keys', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        code_verifier: verifier,
+        code_challenge_method: 'S256'
+      })
+    });
+    const data = await res.json();
+    if (data && data.key) {
+      localStorage.setItem(KEY_STORAGE, data.key);
+      sessionStorage.removeItem('pkce_verifier');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      toast('Signed in! Ready to use.');
     }
   } catch (e) {
-    toast('Sign-in was cancelled or failed.');
+    toast('Sign-in did not complete. Please try again.');
+  }
+  updateAuthUI();
+}
+
+$('authBtn').onclick = () => {
+  if (getUserKey()) {
+    localStorage.removeItem(KEY_STORAGE);
+    updateAuthUI();
+    toast('Signed out. Click Sign in to log in with another account.');
+  } else {
+    startSignIn();
   }
 };
 
-window.addEventListener('DOMContentLoaded', updateAuthUI);
+window.addEventListener('DOMContentLoaded', async () => {
+  await handleOAuthCallback();
+  updateAuthUI();
+});
 
-/* ---------- System Prompt (Strict Qur'an Only) ---------- */
-const SYS_QURAN = `You are Quranayah (quranayah.co.za): an encyclopaedic reference strictly for the text of the Qur’an across all 114 surahs.
-CRITICAL RULE — QUR'AN ONLY:
-- You pull EXCLUSIVELY from the Qur’an. NEVER cite Hadith, Sahih Bukhari, Sahih Muslim, Sunnah, scholars, madhhabs, or external fiqh rulings as if they come from the Qur’an.
-- If a user asks about a well-known Islamic ruling that is NOT explicitly stated in the Qur’an (for example: "Can men wear gold or silk?", "How many rak'ahs are in Fajr?", etc.), state clearly and honestly in "summary" that the Qur’an itself does not explicitly state a specific prohibition or instruction on that exact matter, present the closest verses in the Qur’an that address the broader principle (e.g. Surah Al-A'raf 7:31-32 on adornment, or verses mentioning gold/silk), set "notInQuran": true, and note that for Hadith-based rulings or scholarly fatwas they should consult Sunnah.com or IslamQA.info.
-- Where the Qur’an DOES explicitly address the question (e.g., riba/interest, inheritance, fasting, alcohol, grief, patience), state plainly what the Qur’an says and provide the exact verses.
+/* ---------- Strict Qur'an-Only Prompt ---------- */
+const SYS_QURAN = `You are Quranayah (quranayah.co.za): a gentle, clear reference strictly for what is written in the Qur’an across all 114 surahs.
+RULES:
+1. Pull EXCLUSIVELY from the Qur’an. Never present Hadith, Sunnah, or scholarly fatwas as if they are in the Qur’an.
+2. If someone asks about a ruling that is NOT explicitly stated in the Qur’an (for example: "Can men wear gold?" or silk for men), state clearly in "summary" that the Qur’an itself does not state a specific prohibition on that, share the closest relevant Qur’anic verses (such as Surah Al-A'raf 7:31-32 on adornment), and mention that for Hadith or rulings they can check Sunnah.com or IslamQA.info.
+3. For emotional support ("I am feeling sad", "I feel anxious") or topics directly in the Qur’an, respond with warmth and 2 to 3 fitting ayahs.
+4. Cite 1 to 3 consecutive real ayahs per item ("ref" format: "94:5-6").
+5. "arabic" must be exact Uthmani Arabic with diacritics; "english" must be Sahih International; "transliteration" must be plain, easy-to-read English letters.
+6. Set "crisis": true if self-harm or danger is mentioned.
 
-Output Rules:
-- Cite 1 to 4 real consecutive ayahs per item. "ref" must be "surah:ayah" or "surah:ayah-ayah" (e.g. "7:31-32").
-- "arabic" must be the exact, complete Uthmani Arabic text with diacritics.
-- "english" must be the accurate Sahih International translation of those exact ayahs.
-- "transliteration" must be an easy-to-read English-letter transliteration using plain letters and apostrophes.
-- Never invent or paraphrase verse text.
-- If the person expresses self-harm or danger, set "crisis": true and keep guidance compassionate.
-
-Return ONLY valid JSON with no markdown fences:
+Return ONLY valid JSON:
 {
-  "summary": "2-4 clear sentences directly answering what the Qur’an explicitly says (or noting if the specific rule is not stated in the Qur’an).",
-  "notInQuran": false,
+  "summary": "2-3 warm, clear sentences directly answering from the Qur’an.",
   "crisis": false,
   "guidance": [
     {
-      "kind": "ruling or guidance",
-      "advice": "1-3 sentences explaining the direct relevance to the user's question.",
+      "advice": "1-2 practical sentences tailored to the user.",
       "shareLine": "Short uplifting line, max 14 words",
-      "surah": "Surah name e.g. Al-A'raf",
-      "ref": "7:31-32",
+      "surah": "Surah name",
+      "ref": "94:5-6",
       "arabic": "...",
       "transliteration": "...",
       "english": "...",
-      "why": "1-2 sentences showing how the words of this verse connect to the question without adding external claims."
+      "why": "1-2 sentences connecting the verse to their question."
     }
   ]
 }`;
 
 let lastCtx = '', ctxPrev = '', current = null;
 
-function isCreditOrRateError(err) {
-  const msg = JSON.stringify(err || '').toLowerCase();
-  return (
-    msg.includes('rate_limit') ||
-    msg.includes('429') ||
-    msg.includes('quota') ||
-    msg.includes('credit') ||
-    msg.includes('insufficient') ||
-    msg.includes('allowance') ||
-    msg.includes('billing') ||
-    msg.includes('limit_exceeded')
-  );
-}
-
-function renderCreditExhausted() {
+function renderOutOfCredits() {
   const out = $('out');
   out.textContent = '';
   const box = el('div', 'credit-box');
-  box.appendChild(el('h3', '', 'Your AI Credits Have Run Out or Been Rate-Limited'));
-  box.appendChild(el('p', '', 'Your current account has exhausted its available AI credits or hit its usage limit. Would you like to log in with a different Google/email account, or wait for your credits to renew?'));
-  
+  box.appendChild(el('h3', '', 'You’ve Run Out of Credits'));
+  box.appendChild(el('p', '', 'Your account has used up its available AI credits or hit its rate limit. Would you like to log in with a different account, or wait for your credits to renew again?'));
+
   const row = el('div', 'row');
   const switchBtn = el('button', 'btn fill', 'Log in with a different account');
-  switchBtn.onclick = async () => {
-    try {
-      if (puter.auth.isSignedIn()) await puter.auth.signOut();
-      await puter.auth.signIn();
-      await updateAuthUI();
-      toast('Switched account! Try your search again.');
-    } catch (e) {
-      toast('Account switch cancelled.');
-    }
+  switchBtn.onclick = () => {
+    localStorage.removeItem(KEY_STORAGE);
+    updateAuthUI();
+    startSignIn();
   };
 
-  const waitBtn = el('button', 'btn', 'I will wait for renewal');
+  const waitBtn = el('button', 'btn', 'Wait for credits to renew');
   waitBtn.onclick = () => {
-    toast('Free monthly credits renew automatically on your Puter account.');
+    toast('Free credits renew automatically after the cooldown/daily reset.');
   };
 
   row.append(switchBtn, waitBtn);
@@ -335,26 +355,60 @@ function renderCreditExhausted() {
   out.appendChild(box);
 }
 
+/* Lightweight free models so credits last as long as possible */
+const MODELS = [
+  'google/gemini-2.0-flash-exp:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'openai/gpt-4o-mini'
+];
+
+async function queryModel(model, situation, userKey) {
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${userKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://quranayah.co.za',
+      'X-Title': 'Quranayah'
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: SYS_QURAN },
+        { role: 'user', content: situation }
+      ]
+    })
+  });
+
+  if (res.status === 429 || res.status === 402) {
+    throw { code: 'RATE_LIMITED' };
+  }
+  if (res.status === 401) {
+    throw { code: 'INVALID_AUTH' };
+  }
+  if (!res.ok) {
+    throw new Error('MODEL_UNAVAILABLE');
+  }
+  const json = await res.json();
+  return json.choices?.[0]?.message?.content || '';
+}
+
 $('go').onclick = async () => {
   const prev = ctxPrev;
   ctxPrev = '';
   const rawInput = $('q').value.trim();
-  const situation = (prev ? 'Earlier exchange: ' + prev + '\n\nFollow-up question: ' : '') + rawInput;
+  const situation = (prev ? 'Earlier exchange: ' + prev + '\n\nFollow-up: ' : '') + rawInput;
 
   if (!rawInput) {
-    toast('Please enter a question or topic first');
+    toast('Please type what you need guidance on first.');
     return;
   }
 
-  // Ensure user signs in with their own account so their own credits are used
-  if (!puter.auth.isSignedIn()) {
-    try {
-      await puter.auth.signIn();
-      await updateAuthUI();
-    } catch (e) {
-      toast('Please sign in with Google or Email to use your AI credits.');
-      return;
-    }
+  const userKey = getUserKey();
+  if (!userKey) {
+    toast('Signing you in with Google or Email first…');
+    startSignIn();
+    return;
   }
 
   const btn = $('go');
@@ -362,31 +416,35 @@ $('go').onclick = async () => {
   $('out').textContent = '';
   $('spin').classList.add('on');
 
+  let rawText = '';
+  let lastErr = null;
+
+  for (const model of MODELS) {
+    try {
+      rawText = await queryModel(model, situation, userKey);
+      if (rawText) break;
+    } catch (e) {
+      lastErr = e;
+      if (e && e.code === 'INVALID_AUTH') break;
+    }
+  }
+
   try {
-    const response = await puter.ai.chat(
-      [
-        { role: 'system', content: SYS_QURAN },
-        { role: 'user', content: situation }
-      ],
-      { model: 'claude-sonnet-4-5' }
-    );
-
-    const rawText = typeof response === 'string'
-      ? response
-      : (response?.message?.content?.[0]?.text || response?.message?.content || '');
-
+    if (!rawText) throw lastErr || new Error('FAILED');
     const cleanJson = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
     const data = JSON.parse(cleanJson);
-
     render(data, rawInput);
-    lastCtx = 'User asked: ' + situation.slice(-700) + ' | Answered: ' + (data.summary || '');
+    lastCtx = 'Asked: ' + situation.slice(-700) + ' | Answered: ' + (data.summary || '');
   } catch (e) {
-    console.error(e);
     $('out').textContent = '';
-    if (isCreditOrRateError(e)) {
-      renderCreditExhausted();
+    if (e && e.code === 'RATE_LIMITED') {
+      renderOutOfCredits();
+    } else if (e && e.code === 'INVALID_AUTH') {
+      localStorage.removeItem(KEY_STORAGE);
+      updateAuthUI();
+      $('out').appendChild(el('div', 'summary', 'Your session expired. Please click "Sign in (Google / Email)" at the top and try again.'));
     } else {
-      $('out').appendChild(el('div', 'summary', 'Something went wrong while querying the Qur’an. Please check your connection or try again.'));
+      $('out').appendChild(el('div', 'summary', 'Something went wrong while fetching verses. Please try again in a moment.'));
     }
   }
 
@@ -399,22 +457,21 @@ function render(d, queryText) {
   out.textContent = '';
 
   if (d.crisis) {
-    out.appendChild(el('div', 'crisis', 'If you are in danger or thinking of harming yourself, please contact your local emergency number or a crisis helpline immediately, and reach out to someone you trust today.'));
+    out.appendChild(el('div', 'crisis', 'If you are in danger or thinking of harming yourself, please reach out to local emergency services or someone you trust right away.'));
   }
 
   const sumBox = el('div', 'summary');
   sumBox.appendChild(el('div', '', d.summary || ''));
 
-  // Always offer direct external links for Hadith/Fiqh rulings
   const ext = el('div', 'ext-links');
-  const qEncoded = encodeURIComponent(queryText || '');
-  const sLink = el('a', 'btn', 'Search Hadith on Sunnah.com');
-  sLink.href = `https://sunnah.com/search?q=${qEncoded}`;
+  const qEnc = encodeURIComponent(queryText || '');
+  const sLink = el('a', 'btn', 'Search Sunnah.com');
+  sLink.href = `https://sunnah.com/search?q=${qEnc}`;
   sLink.target = '_blank';
   sLink.rel = 'noopener';
 
-  const iLink = el('a', 'btn', 'Check Rulings on IslamQA.info');
-  iLink.href = `https://islamqa.info/en/search?q=${qEncoded}`;
+  const iLink = el('a', 'btn', 'Search IslamQA.info');
+  iLink.href = `https://islamqa.info/en/search?q=${qEnc}`;
   iLink.target = '_blank';
   iLink.rel = 'noopener';
 
@@ -424,12 +481,11 @@ function render(d, queryText) {
 
   (d.guidance || []).forEach(g => {
     const c = el('div', 'item');
-    if (g.kind === 'ruling') c.appendChild(el('div', 'ref', 'Direct Qur’anic Text'));
     c.appendChild(el('p', 'advice', g.advice));
     c.appendChild(el('p', 'ar', g.arabic));
 
     const tr = el('p', 'tr');
-    tr.appendChild(el('span', 'lbl', 'Transliteration'));
+    tr.appendChild(el('span', 'lbl', 'How to read it'));
     tr.appendChild(document.createTextNode(g.transliteration || ''));
     c.appendChild(tr);
 
@@ -438,7 +494,7 @@ function render(d, queryText) {
     c.appendChild(el('p', 'why', g.why));
 
     const r = el('div', 'row');
-    const s = el('button', 'btn fill', 'Share ayah card');
+    const s = el('button', 'btn fill', 'Share this');
     s.onclick = () => openShare(g);
 
     const v = el('a', 'btn', 'Verify on Quran.com');
@@ -453,10 +509,10 @@ function render(d, queryText) {
   });
 
   const fu = el('div', 'item');
-  fu.appendChild(el('p', 'advice', 'Ask a follow-up question'));
+  fu.appendChild(el('p', 'advice', 'Ask a follow-up'));
   const fi = el('textarea');
   fi.style.minHeight = '80px';
-  fi.placeholder = 'Ask for another verse or clarify what you are looking for…';
+  fi.placeholder = 'Ask something more specific…';
   fu.appendChild(fi);
 
   const fb = el('button', 'main', 'Ask');
@@ -472,11 +528,10 @@ function render(d, queryText) {
   out.scrollIntoView({ behavior: 'smooth' });
 }
 
-/* ---------- Share Card Canvas Generator ---------- */
+/* ---------- Share Card ---------- */
 function shareText(g) {
   return `“${g.shareLine || g.advice}”\n\n${g.arabic}\n\n${g.transliteration || ''}\n\n“${g.english}”\n— Qur’an ${g.ref}${g.surah ? ' (' + g.surah + ')' : ''}\n\nquranayah.co.za`;
 }
-
 function wrap(ctx, text, maxW) {
   const w = text.split(/\s+/), lines = [];
   let l = '';
@@ -488,75 +543,41 @@ function wrap(ctx, text, maxW) {
   if (l) lines.push(l);
   return lines;
 }
-
 async function drawCard(g) {
   const cv = $('cv'), ctx = cv.getContext('2d'), W = 1080, H = 1350;
-  try {
-    await document.fonts.load('48px Amiri', 'بسم');
-    await document.fonts.load('600 36px Inter');
-  } catch (e) {}
+  try { await document.fonts.load('48px Amiri', 'بسم'); await document.fonts.load('600 36px Inter'); } catch (e) {}
   const gr = ctx.createLinearGradient(0, 0, W, H);
-  gr.addColorStop(0, '#07120d');
-  gr.addColorStop(.6, '#0f3d2e');
-  gr.addColorStop(1, '#14442f');
-  ctx.fillStyle = gr;
-  ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = '#d8b25a';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(36, 36, W - 72, H - 72);
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#d8b25a';
-  ctx.font = '600 34px Inter,sans-serif';
-  ctx.direction = 'ltr';
+  gr.addColorStop(0, '#07120d'); gr.addColorStop(.6, '#0f3d2e'); gr.addColorStop(1, '#14442f');
+  ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = '#d8b25a'; ctx.lineWidth = 4; ctx.strokeRect(36, 36, W - 72, H - 72);
+  ctx.textAlign = 'center'; ctx.fillStyle = '#d8b25a'; ctx.font = '600 34px Inter,sans-serif'; ctx.direction = 'ltr';
   ctx.fillText('QURANAYAH', W / 2, 112);
 
   const maxW = W - 200, top = 170, bottom = H - 190;
   let aSize = 64, eSize = 34, aL, eL, tL, total;
   for (;;) {
-    ctx.direction = 'rtl';
-    ctx.font = `${aSize}px Amiri,serif`;
-    aL = wrap(ctx, g.arabic, maxW);
-    const tS = Math.round(eSize * .85);
-    ctx.direction = 'ltr';
-    ctx.font = `italic ${tS}px Inter,sans-serif`;
-    tL = wrap(ctx, g.transliteration || '', maxW);
-    ctx.font = `italic ${eSize}px Inter,sans-serif`;
-    eL = wrap(ctx, '“' + g.english + '”', maxW);
+    ctx.direction = 'rtl'; ctx.font = `${aSize}px Amiri,serif`; aL = wrap(ctx, g.arabic, maxW);
+    const tS = Math.round(eSize * .85); ctx.direction = 'ltr'; ctx.font = `italic ${tS}px Inter,sans-serif`; tL = wrap(ctx, g.transliteration || '', maxW);
+    ctx.font = `italic ${eSize}px Inter,sans-serif`; eL = wrap(ctx, '“' + g.english + '”', maxW);
     total = aL.length * aSize * 1.75 + 30 + tL.length * tS * 1.5 + 30 + eL.length * eSize * 1.5 + 70;
     if (total <= bottom - top || aSize < 26) break;
-    aSize -= 3;
-    eSize = Math.max(20, eSize - 1);
+    aSize -= 3; eSize = Math.max(20, eSize - 1);
   }
   let y = top + (bottom - top - total) / 2 + aSize * 1.2;
-  ctx.fillStyle = '#fff';
-  ctx.direction = 'rtl';
-  ctx.font = `${aSize}px Amiri,serif`;
+  ctx.fillStyle = '#fff'; ctx.direction = 'rtl'; ctx.font = `${aSize}px Amiri,serif`;
   aL.forEach(l => { ctx.fillText(l, W / 2, y); y += aSize * 1.75; });
-  y += 6;
-  ctx.direction = 'ltr';
-  const tS2 = Math.round(eSize * .85);
-  ctx.font = `italic ${tS2}px Inter,sans-serif`;
-  ctx.fillStyle = '#e0bb62';
+  y += 6; ctx.direction = 'ltr'; const tS2 = Math.round(eSize * .85); ctx.font = `italic ${tS2}px Inter,sans-serif`; ctx.fillStyle = '#e0bb62';
   tL.forEach(l => { ctx.fillText(l, W / 2, y); y += tS2 * 1.5; });
-  y += 30;
-  ctx.font = `italic ${eSize}px Inter,sans-serif`;
-  ctx.fillStyle = '#e9efe9';
+  y += 30; ctx.font = `italic ${eSize}px Inter,sans-serif`; ctx.fillStyle = '#e9efe9';
   eL.forEach(l => { ctx.fillText(l, W / 2, y); y += eSize * 1.5; });
-  y += 30;
-  ctx.fillStyle = '#d8b25a';
-  ctx.font = '600 32px Inter,sans-serif';
+  y += 30; ctx.fillStyle = '#d8b25a'; ctx.font = '600 32px Inter,sans-serif';
   ctx.fillText('Qur’an ' + g.ref + (g.surah ? ' · ' + g.surah : ''), W / 2, y);
-  ctx.fillStyle = '#b9cfc3';
-  ctx.font = '500 28px Inter,sans-serif';
-  ctx.fillText('quranayah.co.za', W / 2, H - 80);
+  ctx.fillStyle = '#b9cfc3'; ctx.font = '500 28px Inter,sans-serif'; ctx.fillText('quranayah.co.za', W / 2, H - 80);
 }
-
 const blobOf = () => new Promise(r => $('cv').toBlob(r, 'image/png'));
 
 async function openShare(g) {
-  current = g;
-  $('sheet').classList.add('on');
-  await drawCard(g);
+  current = g; $('sheet').classList.add('on'); await drawCard(g);
   $('wa').href = 'https://wa.me/?text=' + encodeURIComponent(shareText(g));
 }
 $('close').onclick = () => $('sheet').classList.remove('on');
@@ -564,38 +585,23 @@ $('sheet').onclick = e => { if (e.target.id === 'sheet') $('sheet').classList.re
 
 $('shImg').onclick = async () => {
   try {
-    const b = await blobOf();
-    const f = new File([b], 'quranayah.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [f] })) {
-      await navigator.share({ files: [f] });
-      return;
-    }
+    const b = await blobOf(); const f = new File([b], 'quranayah.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f] }); return; }
   } catch (e) { if (e && e.name === 'AbortError') return; }
-  toast('Sharing images isn’t supported here. Saving instead.');
-  saveImg();
+  toast('Sharing images isn’t supported here. Saving instead.'); saveImg();
 };
-
 function saveImg() {
   blobOf().then(b => {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(b);
-    a.download = 'quranayah.png';
-    a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'quranayah.png'; a.click();
   });
 }
 $('svImg').onclick = saveImg;
-
 $('shTxt').onclick = async () => {
-  try {
-    if (navigator.share) { await navigator.share({ text: shareText(current) }); return; }
-  } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { if (navigator.share) { await navigator.share({ text: shareText(current) }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   copy();
 };
-
 function copy() {
-  navigator.clipboard.writeText(shareText(current))
-    .then(() => toast('Copied'))
-    .catch(() => toast('Couldn’t copy'));
+  navigator.clipboard.writeText(shareText(current)).then(() => toast('Copied')).catch(() => toast('Couldn’t copy'));
 }
 $('cp').onclick = copy;
 </script>
