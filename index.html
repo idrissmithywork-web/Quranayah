@@ -39,7 +39,7 @@ body::before{
 }
 .wrap{max-width:640px;margin:0 auto;padding:16px 16px 48px;position:relative}
 
-/* Top Account Bar */
+/* Account Bar */
 .auth-bar{
   display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
   background:rgba(255,255,255,.04);border:1px solid var(--line);
@@ -137,7 +137,6 @@ button.main:active{transform:scale(.99)}
 </head>
 <body>
 <div class="wrap">
-  <!-- Fast Sign-In Bar -->
   <div class="auth-bar">
     <div class="auth-status">
       <span class="dot" id="authDot"></span>
@@ -153,11 +152,11 @@ button.main:active{transform:scale(.99)}
     <p class="sub">Guidance &amp; answers, strictly from the Qur’an</p>
   </header>
 
-  <textarea id="q" placeholder="How are you feeling or what would you like to check in the Qur’an?"></textarea>
+  <textarea id="q" placeholder="Share what is on your heart or ask what the Qur’an says…"></textarea>
   <div class="chips" id="chips"></div>
   <button class="main" id="go">Get guidance</button>
   <p class="note">
-    Quick sign-in with Google or Email (no card required). Pulls <strong>strictly from the Qur’an</strong>—for Hadith or scholarly rulings, visit 
+    Quick popup sign-in with Google or Email—stays right on this page. Pulls <strong>strictly from the Qur’an</strong>; for Hadith or rulings, check 
     <a href="https://sunnah.com" target="_blank" rel="noopener">Sunnah.com</a> or 
     <a href="https://islamqa.info" target="_blank" rel="noopener">IslamQA.info</a>.
   </p>
@@ -186,13 +185,13 @@ button.main:active{transform:scale(.99)}
 <script>
 const $ = id => document.getElementById(id);
 
-/* Simple, everyday starter options */
+/* Everyday starter chips that return direct, clear Qur'anic guidance */
 const examples = [
   "I am feeling sad",
-  "Can men wear gold?",
   "I feel anxious",
-  "I made a mistake",
-  "Give me patience"
+  "I need patience",
+  "I feel guilty",
+  "Guidance on gratitude"
 ];
 examples.forEach(t => {
   const b = document.createElement('button');
@@ -216,8 +215,9 @@ function el(tag, cls, text) {
   return e;
 }
 
-/* ---------- 1-Click OAuth PKCE Sign-In (Google / Email, No Card Required) ---------- */
+/* ---------- In-App Popup OAuth Sign-In (Never Leaves Main Page) ---------- */
 const KEY_STORAGE = 'quranayah_user_api_key';
+const authChannel = new BroadcastChannel('quranayah_auth_channel');
 
 function getUserKey() {
   return localStorage.getItem(KEY_STORAGE) || '';
@@ -248,18 +248,30 @@ async function sha256Base64Url(str) {
   return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-async function startSignIn() {
+async function startSignIn(autoRunAfter = false) {
   const verifier = generateVerifier();
-  sessionStorage.setItem('pkce_verifier', verifier);
+  localStorage.setItem('pkce_verifier', verifier);
+  if (autoRunAfter) localStorage.setItem('quranayah_autorun', '1');
+
   const challenge = await sha256Base64Url(verifier);
   const callbackUrl = window.location.origin + window.location.pathname;
-  window.location.href = `https://openrouter.ai/auth?callback_url=${encodeURIComponent(callbackUrl)}&code_challenge=${challenge}&code_challenge_method=S256`;
+  const authUrl = `https://openrouter.ai/auth?callback_url=${encodeURIComponent(callbackUrl)}&code_challenge=${challenge}&code_challenge_method=S256`;
+
+  const w = 480, h = 640;
+  const left = Math.max(0, (window.screen.width - w) / 2);
+  const top = Math.max(0, (window.screen.height - h) / 2);
+  const popup = window.open(authUrl, 'quranayah_login', `width=${w},height=${h},left=${left},top=${top},popup=yes`);
+
+  // Fallback if browser blocks popups
+  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+    window.location.href = authUrl;
+  }
 }
 
 async function handleOAuthCallback() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
-  const verifier = sessionStorage.getItem('pkce_verifier');
+  const verifier = localStorage.getItem('pkce_verifier');
   if (!code || !verifier) return;
 
   try {
@@ -275,7 +287,15 @@ async function handleOAuthCallback() {
     const data = await res.json();
     if (data && data.key) {
       localStorage.setItem(KEY_STORAGE, data.key);
-      sessionStorage.removeItem('pkce_verifier');
+      localStorage.removeItem('pkce_verifier');
+
+      // If this page is inside the popup window, notify main window and close automatically
+      if (window.opener && !window.opener.closed) {
+        authChannel.postMessage({ type: 'SIGNED_IN' });
+        window.close();
+        return;
+      }
+
       window.history.replaceState({}, document.title, window.location.pathname);
       toast('Signed in! Ready to use.');
     }
@@ -285,19 +305,46 @@ async function handleOAuthCallback() {
   updateAuthUI();
 }
 
+// Listen when the popup finishes signing in
+authChannel.onmessage = (event) => {
+  if (event.data && event.data.type === 'SIGNED_IN') {
+    updateAuthUI();
+    toast('Signed in! Ready to use.');
+    if (localStorage.getItem('quranayah_autorun') === '1') {
+      localStorage.removeItem('quranayah_autorun');
+      if ($('q').value.trim()) $('go').onclick();
+    }
+  }
+};
+
+// Also sync across storage events in case BroadcastChannel is restricted
+window.addEventListener('storage', (e) => {
+  if (e.key === KEY_STORAGE && e.newValue) {
+    updateAuthUI();
+    if (localStorage.getItem('quranayah_autorun') === '1') {
+      localStorage.removeItem('quranayah_autorun');
+      if ($('q').value.trim()) $('go').onclick();
+    }
+  }
+});
+
 $('authBtn').onclick = () => {
   if (getUserKey()) {
     localStorage.removeItem(KEY_STORAGE);
     updateAuthUI();
-    toast('Signed out. Click Sign in to log in with another account.');
+    toast('Signed out. Click Sign in to switch accounts.');
   } else {
-    startSignIn();
+    startSignIn(false);
   }
 };
 
 window.addEventListener('DOMContentLoaded', async () => {
   await handleOAuthCallback();
   updateAuthUI();
+  if (localStorage.getItem('quranayah_autorun') === '1' && getUserKey()) {
+    localStorage.removeItem('quranayah_autorun');
+    if ($('q').value.trim()) $('go').onclick();
+  }
 });
 
 /* ---------- Strict Qur'an-Only Prompt ---------- */
@@ -342,7 +389,7 @@ function renderOutOfCredits() {
   switchBtn.onclick = () => {
     localStorage.removeItem(KEY_STORAGE);
     updateAuthUI();
-    startSignIn();
+    startSignIn(true);
   };
 
   const waitBtn = el('button', 'btn', 'Wait for credits to renew');
@@ -355,7 +402,6 @@ function renderOutOfCredits() {
   out.appendChild(box);
 }
 
-/* Lightweight free models so credits last as long as possible */
 const MODELS = [
   'google/gemini-2.0-flash-exp:free',
   'meta-llama/llama-3.3-70b-instruct:free',
@@ -380,15 +426,9 @@ async function queryModel(model, situation, userKey) {
     })
   });
 
-  if (res.status === 429 || res.status === 402) {
-    throw { code: 'RATE_LIMITED' };
-  }
-  if (res.status === 401) {
-    throw { code: 'INVALID_AUTH' };
-  }
-  if (!res.ok) {
-    throw new Error('MODEL_UNAVAILABLE');
-  }
+  if (res.status === 429 || res.status === 402) throw { code: 'RATE_LIMITED' };
+  if (res.status === 401) throw { code: 'INVALID_AUTH' };
+  if (!res.ok) throw new Error('MODEL_UNAVAILABLE');
   const json = await res.json();
   return json.choices?.[0]?.message?.content || '';
 }
@@ -406,8 +446,8 @@ $('go').onclick = async () => {
 
   const userKey = getUserKey();
   if (!userKey) {
-    toast('Signing you in with Google or Email first…');
-    startSignIn();
+    toast('Opening quick sign-in window…');
+    startSignIn(true);
     return;
   }
 
