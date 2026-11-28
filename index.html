@@ -290,7 +290,7 @@ async function copy(){try{await navigator.clipboard.writeText(shareText(current)
 $('cp').onclick=copy;
 
 // ===== Free trial + OpenRouter sign-in =====
-const FREE_ENDPOINT=''; // paste your Cloudflare Worker URL here (see worker.js) to enable the free first question
+const FREE_ENDPOINT='https://quranayah-free.idrissmithy-work.workers.dev'; // paste your Cloudflare Worker URL here (see worker.js) to enable the free first question
 const MODELS=['openrouter/free','meta-llama/llama-3.3-70b-instruct:free'];
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 function parseAI(t){t=String(t||'').replace(/```json|```/g,'');const a=t.indexOf('{'),z=t.lastIndexOf('}');if(a<0||z<0)throw {code:'fail'};return JSON.parse(t.slice(a,z+1))}
