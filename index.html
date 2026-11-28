@@ -91,6 +91,16 @@ button.main:active{transform:scale(.99)}
 .mock .mb span.ok{background:#6d28d9;color:#fff;outline:3px solid #e0bb62;font-weight:600}
 .fine{font-size:.82rem;color:var(--mute)}
 .lnk{color:var(--gold);cursor:pointer;text-decoration:underline;background:none;border:0;font:inherit;padding:0}
+.spin{padding:10px 0 20px}
+.breath{width:120px;height:120px;border-radius:50%;margin:18px auto 14px;border:1px solid var(--gold);background:radial-gradient(circle,rgba(224,187,98,.5),rgba(224,187,98,.06) 70%);display:flex;align-items:center;justify-content:center;animation:br 8s ease-in-out infinite;box-shadow:0 0 40px rgba(224,187,98,.25)}
+@keyframes br{0%,100%{transform:scale(.72);opacity:.75}50%{transform:scale(1.12);opacity:1}}
+.bt{font-size:.72rem;color:#fff6dc;letter-spacing:.14em;text-transform:uppercase}
+.pz{font-family:Amiri,serif;font-size:1.4rem;color:var(--gold);margin:0 0 14px}
+.vc{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
+.vc .ar{font-size:1.45rem;line-height:2.2;text-align:center}
+.vc .en{font-size:1rem}
+.vc .tr{font-size:.85rem}
+@media (prefers-reduced-motion:reduce){.breath{animation:none}}
 </style>
 </head>
 <body>
@@ -108,7 +118,17 @@ button.main:active{transform:scale(.99)}
 <p class="note">Your first question is free. After that, connect a free OpenRouter account to keep going. Guidance draws only on the Qur’an (Arabic with the Sahih International translation). It is not a fatwa. Please verify verses via the Quran.com links.</p>
 
 <p class="note" id="acct"></p>
-<div class="spin" id="spin">Reflecting on your situation and the Qur’an…</div>
+<div class="spin" id="spin">
+<div class="breath"><span class="bt" id="bt">Breathe in</span></div>
+<p class="pz">Pause for a moment…</p>
+<div class="vc">
+<p class="ar" lang="ar">ٱلَّذِينَ يَذْكُرُونَ ٱللَّهَ قِيَـٰمًا وَقُعُودًا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِى خَلْقِ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضِ رَبَّنَا مَا خَلَقْتَ هَـٰذَا بَـٰطِلًا سُبْحَـٰنَكَ فَقِنَا عَذَابَ ٱلنَّارِ</p>
+<p class="tr">Alladhina yadhkuroonal-laha qiyamanw wa qu’oodanw wa ‘ala junubihim wa yatafakkaroona fi khalqis-samawati wal-ard. Rabbana ma khalaqta hadha batila. Subhanaka faqina ‘adhaban-nar.</p>
+<p class="en">“[They are] those who remember Allah while standing, sitting, and lying on their sides, and reflect on the creation of the heavens and the earth [and pray], ‘Our Lord! You have not created [all of] this without purpose. Glory be to You! Protect us from the torment of the Fire.’”</p>
+<div class="ref">Qur’an 3:191 · Aal-Imran</div>
+</div>
+<p class="fine" id="spinmsg"></p>
+</div>
 <div id="out"></div>
 </div>
 
@@ -171,7 +191,7 @@ Return ONLY JSON: {"summary":"1-2 warm sentences acknowledging their situation",
 const SYS2=`You are Quranayah: a master scholar of the Qur’an with encyclopaedic command of all 114 surahs, their Arabic, their meanings, and how verses relate to one another. People bring you their real lives and their questions, including questions about laws and rulings. You answer with confidence, depth and compassion, using ONLY the Qur’an as your source (no hadith, fiqh books, scholars or any outside source).
 How you work:
 1. Understand the person’s exact situation: the specifics, the emotion, the decision, and any law involved. Do not give generic advice. Speak to their details.
-2. Search the WHOLE Qur’an, not just famous verses. For specific or unusual situations (inheritance, divorce, debt, business dealings, oaths, travel, fasting, parents, neighbours, orphans, witnesses, justice, forgiveness, etc.), find the verses that speak most directly to it, including lesser-known ones. Choose the best-fitting verses, 2 to 5 depending on how complex the situation is. Include every verse that materially bears on a legal question.
+2. Search the WHOLE Qur’an, not just famous verses. For specific or unusual situations (inheritance, divorce, debt, business dealings, oaths, travel, fasting, parents, neighbours, orphans, witnesses, justice, forgiveness, etc.), find the verses that speak most directly to it, including lesser-known ones. Choose the best-fitting verses: usually 2, at most 3 (4 only if the question has several distinct legal parts). Keep every text field tight so the answer is fast. Include every verse that materially bears on a legal question.
 3. For legal or rule questions, set kind to "ruling": state plainly what the Qur’an explicitly commands, permits or prohibits, with the verse. Read the verse together with the verses around it when that changes the meaning (e.g. conditions, exceptions, qualifiers). Where the Qur’an gives a principle but not the detailed procedure, say exactly that, and do not invent detail or attribute anything to other sources. For personal or emotional matters set kind to "guidance".
 4. In "summary", give a direct, confident answer to their question in 2-4 sentences, then let the verses carry the proof.
 5. Each "advice" is concrete action or understanding for THEIR situation (1-3 sentences). Each "why" explains precisely how the verse’s own words and context support that advice (1-3 sentences), without adding claims beyond the Qur’an.
@@ -186,17 +206,17 @@ $('go').onclick=async()=>{
   const prev=ctxPrev;ctxPrev='';
   const situation=(prev?'Earlier exchange: '+prev+'\n\nFollow-up from the person: ':'')+$('q').value.trim();
   if(!situation){toast('Please share your situation first');return}
-  const btn=$('go');btn.disabled=true;$('out').textContent='';$('spin').classList.add('on');
+  const btn=$('go');btn.disabled=true;$('out').textContent='';$('spin').classList.add('on');{const M=['Understanding your situation…','Searching the Qur’an for the right verses…','Preparing your guidance…','Almost there…'];let i=0;$('spinmsg').textContent=M[0];$('bt').textContent='Breathe in';clearInterval(window._tm);window._tm=setInterval(()=>{i=Math.min(i+1,M.length-1);$('spinmsg').textContent=M[i];$('bt').textContent=$('bt').textContent==='Breathe in'?'Breathe out':'Breathe in'},4000)}
   try{
     const data=await askAI(SYS2,situation);
     render(data);lastCtx='Person asked: '+situation.slice(-700)+' | You answered: '+(data.summary||'');
   }catch(e){
     $('out').textContent='';
-    if(e&&e.code==='need_signin'){openSignin();$('spin').classList.remove('on');btn.disabled=false;return}
-    const m=e&&e.code==='not_granted'?'Please sign in to Claude and allow AI access to get guidance, then try again.':e&&e.code==='rate_limited'?'Too many requests right now. Please wait a moment and try again.':'Sorry, guidance couldn’t be generated just now. Please try again.';
+    if(e&&e.code==='need_signin'){openSignin();$('spin').classList.remove('on');clearInterval(window._tm);btn.disabled=false;return}
+    const m=e&&e.code==='not_granted'?'Please sign in to Claude and allow AI access to get guidance, then try again.':e&&e.code==='rate_limited'?'Too many requests right now. Please wait a moment and try again.':'Sorry, that didn’t work this time. Please try again; your free question hasn’t been used up.';
     $('out').appendChild(el('div','summary',m));
   }
-  $('spin').classList.remove('on');btn.disabled=false;
+  $('spin').classList.remove('on');clearInterval(window._tm);btn.disabled=false;
 };
 
 function render(d){
@@ -290,15 +310,30 @@ async function copy(){try{await navigator.clipboard.writeText(shareText(current)
 $('cp').onclick=copy;
 
 // ===== Free trial + OpenRouter sign-in =====
-const FREE_ENDPOINT='https://quranayah-free.idrissmithy-work.workers.dev'; // paste your Cloudflare Worker URL here (see worker.js) to enable the free first question
+const FREE_ENDPOINT=''; // paste your Cloudflare Worker URL here (see worker.js) to enable the free first question
 const MODELS=['openrouter/free','meta-llama/llama-3.3-70b-instruct:free'];
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-function parseAI(t){t=String(t||'').replace(/```json|```/g,'');const a=t.indexOf('{'),z=t.lastIndexOf('}');if(a<0||z<0)throw {code:'fail'};return JSON.parse(t.slice(a,z+1))}
+function parseAI(t){
+  t=String(t||'').replace(/```json|```/g,'');const a=t.indexOf('{');if(a<0)throw {code:'fail'};
+  const z=t.lastIndexOf('}');
+  try{const d=JSON.parse(t.slice(a,z+1));if(d&&d.guidance&&d.guidance.length)return d}catch(e){}
+  const k=t.indexOf('"guidance"');const gi=k<0?-1:t.indexOf('[',k);if(gi<0)throw {code:'fail'};
+  const out=[];let depth=0,start=-1,str=false,esc=false;
+  for(let i=gi+1;i<t.length;i++){const c=t[i];
+    if(str){if(esc)esc=false;else if(c==='\\')esc=true;else if(c==='"')str=false;continue}
+    if(c==='"'){str=true;continue}
+    if(c==='{'){if(depth++===0)start=i}
+    else if(c==='}'){if(--depth===0){try{out.push(JSON.parse(t.slice(start,i+1)))}catch(e){}}}
+  }
+  if(!out.length)throw {code:'fail'};
+  const m=t.match(/"summary"\s*:\s*"((?:[^"\\]|\\.)*)"/);let sum='';try{sum=m?JSON.parse('"'+m[1]+'"'):''}catch(e){}
+  return {summary:sum,crisis:/"crisis"\s*:\s*true/.test(t),guidance:out};
+}
 async function callOR(key,messages){
   let last;
   for(const model of MODELS){
     try{
-      const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json','HTTP-Referer':location.origin,'X-Title':'Quranayah'},body:JSON.stringify({model,messages,max_tokens:2500})});
+      const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json','HTTP-Referer':location.origin,'X-Title':'Quranayah'},body:JSON.stringify({model,messages,max_tokens:4000,response_format:{type:'json_object'}}),signal:AbortSignal.timeout(50000)});
       if(r.status===401){localStorage.removeItem('qa_key');updateAcct();throw {code:'need_signin'}}
       if(!r.ok){last={code:'fail'};continue}
       const j=await r.json();return parseAI(j.choices&&j.choices[0]&&j.choices[0].message.content);
@@ -311,7 +346,8 @@ async function askAI(sys,situation){
   const key=localStorage.getItem('qa_key');
   if(key)return callOR(key,messages);
   if(!FREE_ENDPOINT||localStorage.getItem('qa_free')==='1'){localStorage.setItem('qa_pending',$('q').value);throw {code:'need_signin'}}
-  const r=await fetch(FREE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages})});
+  let r=null;for(let n=0;n<2;n++){try{r=await fetch(FREE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages}),signal:AbortSignal.timeout(60000)})}catch(e){r=null}if(r&&r.status!==502&&r.status!==504)break}
+  if(!r)throw {code:'fail'};
   if(r.status===429){localStorage.setItem('qa_free','1');localStorage.setItem('qa_pending',$('q').value);throw {code:'need_signin'}}
   if(!r.ok)throw {code:'fail'};
   const j=await r.json();const d=parseAI(j.choices&&j.choices[0]&&j.choices[0].message.content);
